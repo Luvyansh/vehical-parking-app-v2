@@ -1,0 +1,6 @@
+Flask
+Flask-SQLAlchemy
+Flask-Bcrypt
+flask-cors
+Flask-JWT-Extended
+Flask-Login
