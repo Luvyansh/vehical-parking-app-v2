@@ -2,5 +2,8 @@ Flask
 Flask-SQLAlchemy
 Flask-Bcrypt
 flask-cors
-Flask-JWT-Extended
+flask-security-too
 Flask-Login
+flask-wtf
+wtforms
+email_validator

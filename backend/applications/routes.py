@@ -1,4 +1,6 @@
-from flask import request, jsonify
+from flask import request, jsonify, session, make_response
+from flask_cors import cross_origin
+from flask_login import login_user, logout_user, login_required, current_user
 from applications.models import *
 from app import app
 
@@ -6,7 +8,7 @@ from app import app
 def index():
     return "Hello, World!"
 
-#Register users
+# ✅ User registration
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -15,9 +17,7 @@ def register():
     email = data.get("email")
     password = data.get("password")
     
-    #Check if user already exists
-    check_user = db.session.query(User).filter_by(email=email).first()
-    if check_user:
+    if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
         return jsonify({"message": "User already exists"}), 400
 
     user = User(name=name, username=username, email=email, password=password)
@@ -29,31 +29,56 @@ def register():
         db.session.rollback()
         return jsonify({"message": "Error registering user"}), 500
 
-#User login
-from flask_jwt_extended import create_access_token
-
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
 
-    user = db.session.query(User).filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first()
+
     if user and bcrypt.check_password_hash(user.password, password):
-        access_token = create_access_token(identity={"username": user.username, "admin": user.admin})
-        return jsonify({
+        login_user(user)  # sets the session cookie
+        user.last_login = datetime.now()
+        db.session.commit()
+
+        response = make_response(jsonify({
             "message": "Login successful",
-            "token": access_token,
             "admin": user.admin
-        }), 200
+        }))
+        print("✅ login_user() called successfully")
+        print("📤 Response headers that will be sent:", dict(response.headers))
+        return response
+
     return jsonify({"message": "Invalid credentials"}), 401
 
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
+@app.route("/check_cookie")
+def check_cookie():
+    print("🔍 Request cookies:", request.cookies)
+    return jsonify({"cookies": dict(request.cookies)}), 200
+
+# ✅ Logout
+@app.route("/logout", methods=["POST"])
+@login_required
+def logout():
+    logout_user()
+    return jsonify({"message": "Logout successful"}), 200
+
+# ✅ Admin dashboard (only if logged in + is admin)
 @app.route("/admin_dashboard", methods=["GET"])
-@jwt_required()
+@login_required
 def admin_dashboard():
-    identity = get_jwt_identity()
-    if not identity['admin']:
+    if not current_user.admin:
         return jsonify({"message": "Unauthorized"}), 403
-    return jsonify({"message": "Welcome Admin!"})
+    return jsonify({"message": f"Welcome Admin {current_user.username}!"}), 200
+
+# ✅ User dashboard (only if logged in + not admin)
+@app.route("/user_dashboard", methods=["GET"])
+@login_required
+def user_dashboard():
+    print("🧠 Current user authenticated:", current_user.is_authenticated)
+    print("🧠 Current user:", current_user)
+    if current_user.admin:
+        return jsonify({"message": "Admin is not allowed here"}), 403
+    return jsonify({"message": f"Welcome {current_user.username}!"}), 200
