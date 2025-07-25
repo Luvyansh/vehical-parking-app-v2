@@ -1,18 +1,23 @@
 <template>
+  <NavBar />
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Vehical Parking App"/>
+    <BaseView v-if="user" :msg="`Welcome, ${user.username}, to Vehicle Parking App`"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import BaseView from '@/components/BaseView.vue'
+import NavBar from '@/components/NavBar.vue';
+import userMixin from '@/mixins/userMixin';
 
 export default {
   name: 'HomeView',
+  mixins: [userMixin],
   components: {
-    HelloWorld
+    BaseView,
+    NavBar
   }
 }
 </script>

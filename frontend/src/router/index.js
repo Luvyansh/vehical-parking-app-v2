@@ -8,11 +8,6 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/about',
-    name: 'about',
-    component: () => import('../views/AboutView.vue')
-  },
-  {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')
@@ -31,6 +26,21 @@ const routes = [
     path: '/admin_dashboard',
     name: 'admin_dashboard',
     component: () => import('../views/AdminView.vue')
+  },
+  {
+    path: '/user_management',
+    name: 'user_management',
+    component: () => import('../views/UserManagerView.vue')
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import('../views/SearchView.vue')
+  },
+  {
+    path: '/admin_summary',
+    name: 'admin_summary',
+    component: () => import('../views/AdminSummary.vue')
   }
 ]
 

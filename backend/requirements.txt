@@ -1,9 +1,12 @@
 Flask
 Flask-SQLAlchemy
 Flask-Bcrypt
+Flask-DotEnv
 flask-cors
-flask-security-too
-Flask-Login
 flask-wtf
-wtforms
 email_validator
+python-dotenv
+flask-jwt-extended
+matplotlib
+Celery
+faker

@@ -1,19 +1,21 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+// import './assets/css/theme.css';
 
 import Vue3Toastify from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const app = createApp(App);
 
 app.use(router);
 app.use(Vue3Toastify, {
-    autoClose: 3000,
-    position: 'top-center',
-    theme: 'colored',
-    transition: 'slide',
-    closeOnClick: true
+    "type": "default",
+    "position": "top-center",
+    "transition": "slide",
+    "dangerouslyHTMLString": true
 });
 
 app.mount('#app');

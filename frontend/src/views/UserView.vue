@@ -1,51 +1,39 @@
 <template>
-    <div class="container mt-5 text-center">
-        <h2>User Dashboard</h2>
-        <p>{{ userMessage }}</p>
-    </div>
+    <NavBar />
 </template>
 
 <script>
-    import { toast } from 'vue3-toastify';
+    import NavBar from '@/components/NavBar.vue';
+    import { toast } from 'vue3-toastify'; // or your toast library
 
     export default {
         name: 'UserView',
-        data() {
-            return {
-            userMessage: ''
-            };
+        components: {
+            NavBar,
         },
         async mounted() {
             try {
-            const response = await fetch('http://localhost:5000/user_dashboard', {
-                method: 'GET',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include', // 🧠 include session cookie
-            });
+                const response = await fetch('http://127.0.0.1:5000/user_dashboard', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                    },
+                    credentials: 'include'
+                });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                toast.error(data.message || 'Access denied', { position: 'top-center' });
-                this.$router.push('/login');
-            } else {
-                this.userMessage = data.message;
-                toast.success(data.message, { position: 'top-center' });
-            }
+                if (!response.ok) {
+                    toast.error('Access Denied: You are logged in as an admin.', { position: 'top-center' });
+                    this.$router.push('/admin_dashboard');
+                } else if (response.ok) {
+                    toast.success('User Authenticated Successfully.', { position: 'top-center' });
+                } else {
+                    toast.error('Unexpected error occurred.', { position: 'top-center' });
+                }
             } catch (error) {
-            toast.error('Server error while loading user dashboard.', { position: 'top-center' });
-            console.error(error);
+                toast.error('Network error or server unavailable.', { position: 'top-center' });
+                console.error(error);
             }
         }
-    };
-</script>
-
-<style scoped>
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
     }
-</style>
+</script>

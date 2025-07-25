@@ -1,29 +1,28 @@
+from flask_bcrypt import Bcrypt
 from flask import Flask
 from flask_cors import CORS
-from flask_login import LoginManager
 from applications.models import db, User
 from config import Config
-from flask import request, jsonify
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+
+bcrypt = Bcrypt()
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
-CORS(app, origins=["http://localhost:8081"], supports_credentials=True)
+bcrypt.init_app(app)
+jwt = JWTManager(app)
 
-login_manager = LoginManager()
-login_manager.init_app(app)
+# Enable FK constraints in SQLite
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
 
-@login_manager.unauthorized_handler
-def unauthorized():
-    print("🚨 Unauthorized access hit — user is not logged in")
-    print("🔍 Request headers:", dict(request.headers))
-    print("🔍 Request cookies:", request.cookies)
-    return jsonify({"message": "Unauthorized"}), 401
+CORS(app, supports_credentials=True)
 
-
-@login_manager.user_loader
-def load_user(user_id):
-    return db.session.get(User, int(user_id))
-
-from applications import routes  # 👈 Now safe to import
+from applications import routes

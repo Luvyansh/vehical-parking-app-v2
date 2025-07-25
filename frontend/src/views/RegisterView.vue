@@ -1,27 +1,28 @@
 <template>
+    <NavBar />
     <div class="container mt-5">
         <h2 class="text-center mb-4">Register</h2>
-        <div class="home-form bg-light p-4 rounded shadow">
+        <div class="home-form bg-neutral p-4 rounded shadow">
             <form @submit.prevent="register">
                 <div class="form-group mb-3">
                     <label for="name">Full Name</label>
-                    <input type="text" v-model="name" class="form-control" id="name" placeholder="Enter name" required>
+                    <input type="text" v-model="name" class="bg-light form-control" id="name" placeholder="Enter name" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="username">Username</label>
-                    <input type="text" v-model="username" class="form-control" id="username" placeholder="Enter username" required>
+                    <input type="text" v-model="username" class="bg-light form-control" id="username" placeholder="Enter username" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="email">Email</label>
-                    <input type="email" v-model="email" class="form-control" id="email" placeholder="Enter email" required>
+                    <input type="email" v-model="email" class="bg-light form-control" id="email" placeholder="Enter email" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="password">Password</label>
-                    <input type="password" v-model="password" class="form-control" id="password" placeholder="Enter password" required>
+                    <input type="password" v-model="password" class="bg-light form-control" id="password" placeholder="Enter password" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" v-model="confirmPassword" class="form-control" id="confirmPassword" placeholder="Confirm password" required>
+                    <input type="password" v-model="confirmPassword" class="bg-light form-control" id="confirmPassword" placeholder="Confirm password" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Register</button>
             </form>
@@ -30,6 +31,7 @@
 </template>
 
 <script>
+    import NavBar from '@/components/NavBar.vue';
     import { toast } from 'vue3-toastify';
 
     export default {
@@ -41,6 +43,9 @@
             password: '',
             confirmPassword: '',
             };
+        },
+        components: {
+            NavBar,
         },
         methods: {
             checkPasswordsMatch() {

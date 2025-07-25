@@ -1,10 +1,14 @@
+from dotenv import load_dotenv
+from datetime import timedelta
 import os
 
-class Config:
-    SQLALCHEMY_DATABASE_URI = "sqlite:///parking_db.db"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.getenv("SECRET_KEY", "change_this_to_a_strong_key")
+load_dotenv()
 
-    # 🧠 These are REQUIRED for cookie-based auth across ports (CORS)
-    SESSION_COOKIE_SAMESITE = "Lax"
-    SESSION_COOKIE_SECURE = False # Use True if using HTTPS
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+class Config:
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(basedir, 'instance', 'parking_db.db')}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=4)
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
