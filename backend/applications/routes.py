@@ -1,12 +1,14 @@
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_jwt_identity, unset_jwt_cookies
 from applications.models import *
 from applications import app, db, bcrypt
-from app import admin_required, user_required
+from applications.auth_utils import admin_required, user_required
+from tools import tasks
 
 @app.route("/", methods=["GET"])
 def index():
-    return "Hello, World!"
+    tasks.add.delay(1, 2)
+    return render_template("index.html")
 
 # ✅ User registration
 @app.route("/register", methods=["POST"])
@@ -90,24 +92,6 @@ def logout():
     unset_jwt_cookies(response)
     return response, 200
 
-@app.route("/locations", methods=["GET"])
-@jwt_required()
-def locations():
-    locations = Location.query.all()
-    return jsonify({"locations": [loc.to_dict() for loc in locations]}), 200
-
-@app.route("/parking_lots", methods=["GET"])
-@jwt_required()
-def parking_lots():
-    lots = ParkingLot.query.all()
-    spots = ParkingSpot.query.all()
-    reservedSpots = ReservedParking.query.all()
-    return jsonify({
-        "lots": [lot.to_dict() for lot in lots],
-        "spots": [spot.to_dict() for spot in spots],
-        "reservedSpots": [reservedSpot.to_dict() for reservedSpot in reservedSpots]
-    }), 200
-
 @app.route("/get_locations", methods=["GET"])
 @jwt_required()
 def get_locations():
@@ -117,6 +101,18 @@ def get_locations():
 ##################################################################################
 ############################CRUD on Admin Dashboard###############################
 ##################################################################################
+
+@app.route("/parking_lots", methods=["GET"])
+@admin_required
+def parking_lots():
+    lots = ParkingLot.query.all()
+    spots = ParkingSpot.query.all()
+    reservedSpots = ReservedParking.query.all()
+    return jsonify({
+        "lots": [lot.to_dict() for lot in lots],
+        "spots": [spot.to_dict() for spot in spots],
+        "reservedSpots": [reservedSpot.to_dict() for reservedSpot in reservedSpots]
+    }), 200
 
 @app.route("/add_location", methods=["POST"])
 @admin_required
@@ -302,11 +298,9 @@ def reserve_spot():
 
     spot_id = data.get("spot_id")
     park_time_str = data.get("park_time")
-    exit_time_str = data.get("exit_time")
-    total_cost = data.get("total_cost")
 
     # Validate required fields
-    if not all([spot_id, park_time_str, exit_time_str, total_cost]):
+    if not all([spot_id, park_time_str]):
         return jsonify({"message": "Missing required fields"}), 400
 
     # Validate spot
@@ -316,32 +310,83 @@ def reserve_spot():
 
     try:
         park_time = datetime.fromisoformat(park_time_str)
-        exit_time = datetime.fromisoformat(exit_time_str)
-        total_cost = float(total_cost)
     except Exception:
         return jsonify({"message": "Invalid data format"}), 400
 
     # Reserve and update
-    reserved_parking = ReservedParking(user_id, spot_id, park_time, exit_time, total_cost)
+    reserved_parking = ReservedParking(user_id, spot_id, park_time, None, None)
     spot.is_available = False
 
     db.session.add(reserved_parking)
     db.session.commit()
+    
+    # Store the reservation ID in reservation_id
+    reservation_id = reserved_parking.id
+    
+    tasks.send_reservation_email.delay(reservation_id)
 
     return jsonify({
         "message": "Spot reserved successfully",
         "reservation": reserved_parking.to_dict()
     }), 200
 
-@app.route("/cancel_reservation/<int:reservation_id>", methods=["DELETE"])
-@jwt_required()
-def cancel_reservation(reservation_id):
-    reserved_parking = ReservedParking.query.get_or_404(reservation_id)
-    if not reserved_parking:
-        return jsonify({"message": "Reservation not found"}), 404
-    spot = ParkingSpot.query.get(reserved_parking.spot_id)
-    if spot:
-        spot.is_available = True
-    db.session.delete(reserved_parking)
+@app.route("/release_parking/<int:reservation_id>", methods=["PUT"])
+@user_required
+def release_parking(reservation_id):
+    # Validate if current user = user who reserved the spot
+    user_id = int(get_jwt_identity()) #get_jwt_identity returns a string
+    reservation = ReservedParking.query.get_or_404(reservation_id)
+
+    if reservation.user_id != user_id:
+        return jsonify({"message": "You are not authorized to release this spot. User who booked the spot is: " + str(reservation.user_id) + " and you are: " + str(user_id)}), 403
+    
+    exit_time = datetime.now()
+    reservation.exit_time = exit_time
+    spot = ParkingSpot.query.get_or_404(reservation.spot_id)
+    lot = ParkingLot.query.get_or_404(spot.lot_id)
+    price_per_hour = lot.price * (exit_time - reservation.park_time).total_seconds() / 3600
+    total_cost = (exit_time - reservation.park_time).total_seconds() / 3600 * price_per_hour
+    reservation.total_cost = total_cost
+    spot.is_available = True
+    db.session.add(reservation)
+    db.session.add(spot)
     db.session.commit()
-    return jsonify({"message": "Reservation canceled successfully"}), 200
+    return jsonify({"message": "Parking released successfully"}), 200
+
+@app.route("/user_search/<string:query>", methods=["GET"])
+@user_required
+def user_search(query: str):
+    lots = []
+    reservations = []
+    for lot in ParkingLot.query.all():
+        if query in lot.prime_location_name.lower() or query in lot.address.lower() or query in str(lot.pin_code):
+            lots.append({
+                "ID": lot.id,
+                "Location": lot.prime_location_name,
+                "Address": lot.address,
+                "Pin": lot.pin_code,
+                "Price": lot.price
+            })
+
+    for res in ReservedParking.query.filter_by(user_id=get_jwt_identity()).all():
+        if query in str(res.user_id) or query in str(res.spot_id) or query in str(res.id):
+            reservations.append({
+                "ID": res.id,
+                "User ID": res.user_id,
+                "Spot ID": res.spot_id,
+                "Park Time": res.park_time.strftime("%Y-%m-%d %H:%M"),
+                "Exit Time": res.exit_time.strftime("%Y-%m-%d %H:%M"),
+                "Cost": res.total_cost
+            })
+
+    return jsonify({
+        "lots": lots,
+        "reservations": reservations
+    })
+
+@app.route("/get_user_reservations/<string:user_name>", methods=["GET"])
+@user_required
+def get_user_reservations(user_name):
+    user_id = User.query.filter_by(username=user_name).first().id
+    reservations = ReservedParking.query.filter_by(user_id=user_id).all()
+    return jsonify({"reservations": [res.to_dict() for res in reservations]}), 200

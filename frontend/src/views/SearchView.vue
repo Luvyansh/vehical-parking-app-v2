@@ -127,6 +127,26 @@ export default {
             );
         }
     },
+    async mounted() {
+        try {
+            const res = await fetch('http://127.0.0.1:5000/admin_dashboard');
+            if (!res.ok) {
+                toast.error('Unauthorized or server error.', {
+                    position: 'top-center',
+                    onClose: () => {
+                        this.$router.push('/admin_dashboard');
+                    },
+                });
+            }
+            const data = await res.json();
+            this.results.users = data.users;
+            this.results.lots = data.lots;
+            this.results.reservations = data.reservations;
+        } catch (err) {
+            console.error(err);
+            toast.error('Failed to fetch search results.', { position: 'top-center' });
+        }
+    },
     methods: {
         async deleteUser(id) {
             try {

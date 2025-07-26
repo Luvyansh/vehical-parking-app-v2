@@ -2,3 +2,6 @@ backend/__pycache__
 backend/wslenv
 frontend/node_modules
 backend/instance
+backend/applications/__pycache__
+backend/applications/__pycache__
+backend/winenv

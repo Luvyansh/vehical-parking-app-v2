@@ -9,4 +9,6 @@ python-dotenv
 flask-jwt-extended
 matplotlib
 Celery
-faker
+Faker
+Redis
+flask_mail

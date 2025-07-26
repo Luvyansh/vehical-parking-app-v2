@@ -106,8 +106,8 @@ class ReservedParking(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     spot_id = db.Column(db.Integer, db.ForeignKey('parking_spot.id', ondelete='CASCADE'), nullable=False)
     park_time = db.Column(db.DateTime, nullable=False)
-    exit_time = db.Column(db.DateTime, nullable=False)
-    total_cost = db.Column(db.Float, nullable=False)
+    exit_time = db.Column(db.DateTime, nullable=True)
+    total_cost = db.Column(db.Float, nullable=True)
 
     def __init__(self, user_id, spot_id, park_time, exit_time, total_cost):
         self.user_id = user_id
@@ -144,13 +144,11 @@ def free_reserved_spots(mapper, connection, target):
 @event.listens_for(ReservedParking, 'before_insert')
 def update_spot_availability(mapper, connection, target):
     session = Session(bind=connection)
-
     spot = session.query(ParkingSpot).get(target.spot_id)
     if not spot:
         return
 
-    # Update availability based on exit_time
-    if target.exit_time < datetime.now():
+    if target.exit_time is not None and target.exit_time < datetime.now():
         spot.is_available = True
     else:
         spot.is_available = False
