@@ -34,6 +34,24 @@ export default {
     components: {
         NavBar,
     },
+    async mounted() {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            const userInfoResponse = await fetch('http://127.0.0.1:5000/get_user_info', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            const userInfo = await userInfoResponse.json();
+            if (userInfo.user && userInfo.user.admin === true) {
+                this.$router.push('/admin_dashboard');
+            } else {
+                this.$router.push('/user_dashboard');
+            }
+        }
+    },
     methods: {
         async login() {
             try {
@@ -60,13 +78,15 @@ export default {
                     onClose: async () => {
                         // ✅ Fetch user info with token
                         const token = localStorage.getItem('access_token');
+                        if (!token) {
+                            return;
+                        }
                         const userInfoResponse = await fetch('http://127.0.0.1:5000/get_user_info', {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${token}`,
                             },
-                            credentials: 'include',
                         });
                         const userInfo = await userInfoResponse.json();
                         if (userInfo.user && userInfo.user.admin === true) {

@@ -23,6 +23,21 @@ const routes = [
     component: () => import('../views/UserView.vue')
   },
   {
+    path: '/user_search',
+    name: 'user_search',
+    component: () => import('../views/UserSearchView.vue')
+  },
+  {
+    path: '/book_parking',
+    name: 'book_parking',
+    component: () => import('../views/BookingView.vue')
+  },
+  {
+    path: '/user_summary',
+    name: 'user_summary',
+    component: () => import('../views/UserSummary.vue')
+  },
+  {
     path: '/admin_dashboard',
     name: 'admin_dashboard',
     component: () => import('../views/AdminView.vue')

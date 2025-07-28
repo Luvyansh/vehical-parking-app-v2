@@ -174,7 +174,7 @@ export default {
             this.showEditModal = false;
             const index = this.lots.findIndex(lot => lot.id === updatedLot.id);
             if (index !== -1) {
-                this.$set(this.lots, index, updatedLot);
+                this.lots.splice(index, 1, updatedLot);
             }
         },
 

@@ -6,23 +6,28 @@
             <form @submit.prevent="register">
                 <div class="form-group mb-3">
                     <label for="name">Full Name</label>
-                    <input type="text" v-model="name" class="bg-light form-control" id="name" placeholder="Enter name" required>
+                    <input type="text" v-model="name" class="bg-light form-control" id="name" placeholder="Enter name"
+                        required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="username">Username</label>
-                    <input type="text" v-model="username" class="bg-light form-control" id="username" placeholder="Enter username" required>
+                    <input type="text" v-model="username" class="bg-light form-control" id="username"
+                        placeholder="Enter username" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="email">Email</label>
-                    <input type="email" v-model="email" class="bg-light form-control" id="email" placeholder="Enter email" required>
+                    <input type="email" v-model="email" class="bg-light form-control" id="email"
+                        placeholder="Enter email" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="password">Password</label>
-                    <input type="password" v-model="password" class="bg-light form-control" id="password" placeholder="Enter password" required>
+                    <input type="password" v-model="password" class="bg-light form-control" id="password"
+                        placeholder="Enter password" required>
                 </div>
                 <div class="form-group mb-3">
                     <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" v-model="confirmPassword" class="bg-light form-control" id="confirmPassword" placeholder="Confirm password" required>
+                    <input type="password" v-model="confirmPassword" class="bg-light form-control" id="confirmPassword"
+                        placeholder="Confirm password" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Register</button>
             </form>
@@ -31,27 +36,47 @@
 </template>
 
 <script>
-    import NavBar from '@/components/NavBar.vue';
-    import { toast } from 'vue3-toastify';
+import NavBar from '@/components/NavBar.vue';
+import { toast } from 'vue3-toastify';
 
-    export default {
-        data() {
-            return {
+export default {
+    data() {
+        return {
             name: '',
             username: '',
             email: '',
             password: '',
             confirmPassword: '',
-            };
-        },
-        components: {
-            NavBar,
-        },
-        methods: {
-            checkPasswordsMatch() {
+        };
+    },
+    components: {
+        NavBar,
+    },
+
+    async mounted() {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            const userInfoResponse = await fetch('http://127.0.0.1:5000/get_user_info', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            const userInfo = await userInfoResponse.json();
+            if (userInfo.user && userInfo.user.admin === true) {
+                this.$router.push('/admin_dashboard');
+            } else {
+                this.$router.push('/user_dashboard');
+            }
+        }
+    },
+
+    methods: {
+        checkPasswordsMatch() {
             return this.password === this.confirmPassword;
-            },
-            async register() {
+        },
+        async register() {
             if (!this.checkPasswordsMatch()) {
                 toast.error('Passwords do not match');
                 return;
@@ -59,43 +84,43 @@
 
             try {
                 const response = await fetch('http://127.0.0.1:5000/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: this.name,
-                    username: this.username,
-                    email: this.email,
-                    password: this.password,
-                }),
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: this.name,
+                        username: this.username,
+                        email: this.email,
+                        password: this.password,
+                    }),
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                if (data.message === "User already exists") {
-                    toast.warning(data.message, {
-                    onClose: () => {
-                        this.$router.push('/login');
-                    },
-                });
+                    if (data.message === "User already exists") {
+                        toast.warning(data.message, {
+                            onClose: () => {
+                                this.$router.push('/login');
+                            },
+                        });
+                    } else {
+                        toast.error(data.message || "Registration failed");
+                    }
                 } else {
-                    toast.error(data.message || "Registration failed");
-                }
-                } else {
-                toast.success(data.message || "Registration successful", {
-                    onClose: () => {
-                    this.$router.push('/login');
-                    },
-                });
+                    toast.success(data.message || "Registration successful", {
+                        onClose: () => {
+                            this.$router.push('/login');
+                        },
+                    });
                 }
             } catch (error) {
                 toast.error("Server error. Try again later.");
             }
-            }
         }
     }
+}
 </script>
 
 

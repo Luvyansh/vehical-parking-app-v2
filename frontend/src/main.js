@@ -15,7 +15,12 @@ app.use(Vue3Toastify, {
     "type": "default",
     "position": "top-center",
     "transition": "slide",
-    "dangerouslyHTMLString": true
+    "closeOnClick": true,
+    "pauseOnFocusLoss": true,
+    "pauseOnHover": false,
+    "draggable": true,
+    "draggablePercent": 0.6,
+    "closeButton": true
 });
 
 app.mount('#app');

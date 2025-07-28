@@ -12,3 +12,4 @@ Celery
 Faker
 Redis
 flask_mail
+Flask-Caching

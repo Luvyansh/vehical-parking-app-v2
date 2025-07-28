@@ -11,10 +11,16 @@
                 <!-- If Logged In and User -->
                 <ul v-if="loggedIn && user && !user.admin" class="navbar-nav me-auto px-2">
                     <li class="nav-item px-2">
-                        <router-link class="btn btn-outline-success" to="/user_dashboard">Home</router-link>
+                        <router-link class="btn btn-outline-primary" to="/user_dashboard">Home</router-link>
                     </li>
                     <li class="nav-item px-2">
-                        <router-link class="btn btn-outline-primary" to="/summary">Summary</router-link>
+                        <router-link class="btn btn-outline-primary" to="/book_parking">Book</router-link>
+                    </li>
+                    <li class="nav-item px-2">
+                        <router-link class="btn btn-outline-primary" to="/user_search">Search</router-link>
+                    </li>
+                    <li class="nav-item px-2">
+                        <router-link class="btn btn-outline-primary" to="/user_summary">Summary</router-link>
                     </li>
                 </ul>
                 <!-- If Logged In and Admin -->

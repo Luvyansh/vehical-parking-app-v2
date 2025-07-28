@@ -50,7 +50,7 @@ def seed_dummy_data(num_users=5, num_locations=5, lots_per_location=2, spots_per
 
         for _ in range(lots_per_location):
             prime_location_name = fake.company()
-            price = round(random.uniform(10, 100), 2)
+            price = round(random.uniform(10, 50), 2)
             address = fake.address()
             pin_code = fake.postcode()[:6]
             number_of_spots = spots_per_lot
@@ -70,12 +70,9 @@ def seed_dummy_data(num_users=5, num_locations=5, lots_per_location=2, spots_per
     for _ in range(min(10, len(all_spots))):
         user = random.choice(users)
         spot = random.choice(all_spots)
-
         park_time = datetime.now() - timedelta(hours=random.randint(1, 24))
-        exit_time = park_time + timedelta(hours=random.randint(1, 5))
-        total_cost = round(random.uniform(10, 100), 2)
 
-        reservation = ReservedParking(user_id=user.id, spot_id=spot.id, park_time=park_time, exit_time=exit_time, total_cost=total_cost)
+        reservation = ReservedParking(user_id=user.id, spot_id=spot.id, park_time=park_time)
         db.session.add(reservation)
 
     db.session.commit()
@@ -85,7 +82,7 @@ def seed_dummy_data(num_users=5, num_locations=5, lots_per_location=2, spots_per
 with app.app_context():
     user_count = User.query.count()
     if user_count <= 1:
-        print("🔄 Seeding dummy data...")
+        print("🔁 Seeding dummy data...")
         seed_dummy_data()
     else:
         pass

@@ -1,7 +1,7 @@
 <template>
     <NavBar />
     <div class="container d-flex flex-column align-items-center justify-content-center mt-5">
-        <h2 class="mb-4 text-center">Admin Search</h2>
+        <h2 class="mb-4 text-center">User Search</h2>
 
         <div class="w-100" style="max-width: 600px;">
             <input v-model="query" @keyup.enter="performSearch" type="text" class="form-control form-control-lg"
@@ -9,35 +9,6 @@
         </div>
 
         <button class="btn btn-primary mt-3" @click="performSearch">Search</button>
-
-        <!-- Users Table -->
-        <div class="w-100 mt-5" v-if="results.users && results.users.length">
-            <h4 class="text-center">Users ({{ results.users.length }})</h4>
-            <div class="table-responsive">
-                <table class="table table-bordered mt-3">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(user, index) in results.users" :key="index">
-                            <td>{{ user.ID }}</td>
-                            <td>{{ user.Name }}</td>
-                            <td>{{ user.Username }}</td>
-                            <td>{{ user.Email }}</td>
-                            <td>
-                                <button class="btn btn-danger" @click="deleteUser(user.ID)">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
         <!-- Parking Lots Table -->
         <div class="w-100 mt-5" v-if="results.lots && results.lots.length">
@@ -112,7 +83,6 @@ export default {
         return {
             query: '',
             results: {
-                users: [],
                 lots: [],
                 reservations: []
             },
@@ -122,7 +92,6 @@ export default {
     computed: {
         totalResults() {
             return (
-                this.results.users.length +
                 this.results.lots.length +
                 this.results.reservations.length
             );
@@ -130,7 +99,7 @@ export default {
     },
     async mounted() {
         try {
-            const res = await fetch('http://127.0.0.1:5000/admin_dashboard', {
+            const res = await fetch('http://127.0.0.1:5000/user_dashboard', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,10 +124,18 @@ export default {
         }
     },
     methods: {
-        async deleteUser(id) {
+        async performSearch() {
+            this.searched = true;
+            this.results = { lots: [], reservations: [] };
+
+            if (!this.query.trim()) {
+                toast.warning('Enter a search query.', { position: 'top-center' });
+                return;
+            }
+
             try {
-                const res = await fetch(`http://127.0.0.1:5000/delete_user/${id}`, {
-                    method: 'DELETE',
+                const res = await fetch(`http://127.0.0.1:5000/user_search?q=${encodeURIComponent(this.query)}`, {
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + localStorage.getItem('access_token')
@@ -170,42 +147,8 @@ export default {
                     return;
                 }
 
-                toast.success('User deleted successfully.', { position: 'top-center' });
-
-                // Remove user from the results after successful delete
-                this.results.users = this.results.users.filter(user => user.ID !== id);
-
-            } catch (err) {
-                console.error(err);
-                toast.error('Delete failed.', { position: 'top-center' });
-            }
-        },
-
-        async performSearch() {
-            this.searched = true;
-            this.results = { users: [], lots: [], reservations: [] };
-
-            if (!this.query.trim()) {
-                toast.warning('Enter a search query.', { position: 'top-center' });
-                return;
-            }
-
-            try {
-                const res = await fetch(`http://127.0.0.1:5000/search?q=${encodeURIComponent(this.query)}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-                    }
-                });
-
-                if (!res.ok) {
-                    toast.error('Unauthorized or server error.', { position: 'top-center' });
-                    return;
-                }
-
                 const data = await res.json();
                 this.results = {
-                    users: data.users || [],
                     lots: data.lots || [],
                     reservations: data.reservations || []
                 };

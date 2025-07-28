@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.7",
+    "chart.js": "^4.5.0",
     "core-js": "^3.8.3",
     "dayjs": "^1.11.13",
     "vue": "^3.2.13",

@@ -9,9 +9,9 @@ import csv
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(5*60, send_daily_remainders.s(), name='send_daily_remainders')
+    sender.add_periodic_task(10*60, send_daily_remainders.s(), name='send_daily_remainders')
     #sender.add_periodic_task(crontab(hour=10, minute=30), send_daily_remainders.s(), name='send_daily_remainders_at_10:30')
-    sender.add_periodic_task(5*60, send_monthly_reports.s(), name='send_monthly_reports')
+    sender.add_periodic_task(10*60, send_monthly_reports.s(), name='send_monthly_reports')
 
 @celery.task()
 def add(x, y):
@@ -65,7 +65,7 @@ def send_release_email(reservation_id):
     to = email
     subject = f'Reservation for Spot {reservation.spot_id} has been released'
 
-    send_email(to=to, subject=subject, html=html, content_type='text/html')
+    send_email(to=to, subject=subject, html=html)
     return "Email sent successfully"
 
 @celery.task()
@@ -140,7 +140,6 @@ def send_monthly_reports():
     return "Monthly reports sent successfully"
 
 def generate_monthly_csv_report(reservations):
-        # Use StringIO to build the CSV in memory
     output = io.StringIO()
     writer = csv.writer(output)
 
