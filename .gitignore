@@ -1,7 +1,8 @@
 backend/__pycache__
 backend/wslenv
 frontend/node_modules
-backend/instance
+backend/instance/parking_db.db
 backend/applications/__pycache__
 backend/applications/__pycache__
 backend/winenv
+backend/.venv

@@ -10,7 +10,6 @@
 
         <button class="btn btn-primary mt-3" @click="performSearch">Search</button>
 
-        <!-- Users Table -->
         <div class="w-100 mt-5" v-if="results.users && results.users.length">
             <h4 class="text-center">Users ({{ results.users.length }})</h4>
             <div class="table-responsive">
@@ -39,7 +38,6 @@
             </div>
         </div>
 
-        <!-- Parking Lots Table -->
         <div class="w-100 mt-5" v-if="results.lots && results.lots.length">
             <h4 class="text-center">Parking Lots ({{ results.lots.length }})</h4>
             <div class="table-responsive">
@@ -59,14 +57,13 @@
                             <td>{{ lot.Location }}</td>
                             <td>{{ lot.Address }}</td>
                             <td>{{ lot.Pin }}</td>
-                            <td>₹ {{ lot.Price.toFixed(2) }}</td>
+                            <td>₹ {{ lot.Price?.toFixed(2) || 'N/A' }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Reservations Table -->
         <div class="w-100 mt-5" v-if="results.reservations && results.reservations.length">
             <h4 class="text-center">Reservations ({{ results.reservations.length }})</h4>
             <div class="table-responsive">
@@ -88,7 +85,7 @@
                             <td>{{ res["Spot ID"] }}</td>
                             <td>{{ res["Park Time"] }}</td>
                             <td>{{ res["Exit Time"] }}</td>
-                            <td>₹ {{ res["Total Cost"].toFixed(2) }}</td>
+                            <td>₹ {{ res["Total Cost"] != null ? res["Total Cost"] : 'N/A' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -151,7 +148,7 @@ export default {
             this.results.reservations = data.reservations;
         } catch (err) {
             console.error(err);
-            toast.error('Failed to fetch search results.', { position: 'top-center' });
+            toast.error('Failed to fetch initial data.', { position: 'top-center' });
         }
     },
     methods: {
@@ -183,7 +180,7 @@ export default {
 
         async performSearch() {
             this.searched = true;
-            this.results = { users: [], lots: [], reservations: [] };
+            this.results = { users: [], lots: [], reservations: [] }; // Clear previous results
 
             if (!this.query.trim()) {
                 toast.warning('Enter a search query.', { position: 'top-center' });

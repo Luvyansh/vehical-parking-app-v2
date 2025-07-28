@@ -1,7 +1,4 @@
 from applications import app, db, User
-from flask import jsonify
-from flask_jwt_extended import jwt_required, get_jwt
-from functools import wraps
 from applications.models import *
 from faker import Faker # type: ignore
 import random
@@ -67,12 +64,12 @@ def seed_dummy_data(num_users=5, num_locations=5, lots_per_location=2, spots_per
                 all_spots.append(spot)
 
     users = User.query.filter_by(admin=False).all()
-    for _ in range(min(10, len(all_spots))):
+    for _ in range(min(20, len(all_spots))):
         user = random.choice(users)
         spot = random.choice(all_spots)
         park_time = datetime.now() - timedelta(hours=random.randint(1, 24))
 
-        reservation = ReservedParking(user_id=user.id, spot_id=spot.id, park_time=park_time)
+        reservation = ReservedParking(user_id=user.id, spot_id=spot.id, park_time=park_time, exit_time=None, total_cost=None)
         db.session.add(reservation)
 
     db.session.commit()

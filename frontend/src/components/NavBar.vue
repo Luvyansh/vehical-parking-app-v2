@@ -1,6 +1,9 @@
 <template>
     <nav class="navbar bg-dark text-light navbar-expand-lg" style="position: sticky; top: 0; z-index: 1030;">
         <div class="container-fluid">
+            <!-- Logo -->
+            <img src="../assets/logo.png" alt="Logo" class="navbar-brand" style="width: 50px; height: 50px;">
+            <!-- Brand -->
             <router-link class="navbar-brand text-primary fw-bold" to="/">Parking<font class="text-secondary">Pal</font>
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -40,11 +43,15 @@
                 </ul>
 
                 <ul v-if="loggedIn" class="navbar-nav ms-auto px-2">
-                    <li v-if="user" class="nav-item px-2">
-                        <router-link class="nav-link">
+                    <li v-if="!user.admin" class="nav-item px-2">
+                        <router-link class="nav-link" to="/user_profile">
                             {{ user.username }}
                         </router-link>
                     </li>
+                    <li v-if="user.admin" class="nav-item px-2 align-self-center fw-bold">
+                        {{ user.username }} @ ParkingPal
+                    </li>
+
                     <li class="nav-item px-2">
                         <button class="btn btn-danger" @click="logout">Logout</button>
                     </li>

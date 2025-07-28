@@ -30,7 +30,7 @@
                             <td>{{ lot.Location }}</td>
                             <td>{{ lot.Address }}</td>
                             <td>{{ lot.Pin }}</td>
-                            <td>₹ {{ lot.Price.toFixed(2) }}</td>
+                            <td>₹ {{ lot.Price != null ? lot.Price.toFixed(2) : 'N/A' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -59,7 +59,7 @@
                             <td>{{ res["Spot ID"] }}</td>
                             <td>{{ res["Park Time"] }}</td>
                             <td>{{ res["Exit Time"] }}</td>
-                            <td>₹ {{ res["Total Cost"].toFixed(2) }}</td>
+                            <td>₹ {{ res["Total Cost"] != null ? res["Total Cost"].toFixed(2) : 'N/A' }}</td>
                         </tr>
                     </tbody>
                 </table>

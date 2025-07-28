@@ -38,6 +38,11 @@ const routes = [
     component: () => import('../views/UserSummary.vue')
   },
   {
+    path: '/user_profile',
+    name: 'user_profile',
+    component: () => import('../views/ProfileView.vue')
+  },
+  {
     path: '/admin_dashboard',
     name: 'admin_dashboard',
     component: () => import('../views/AdminView.vue')

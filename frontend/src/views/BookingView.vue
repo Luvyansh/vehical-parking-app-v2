@@ -158,6 +158,12 @@ export default {
     opacity: 0;
 }
 
+/* ⭐ MISSING CLASS ⭐ */
+.fade-move {
+    transition: transform 0.5s ease;
+    /* Adjust duration and easing as needed */
+}
+
 .container {
     max-width: 1200px;
 }

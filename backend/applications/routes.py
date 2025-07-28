@@ -97,7 +97,6 @@ def logout():
 
 @cache.cached(timeout=60*60)
 @app.route("/get_locations", methods=["GET"])
-@jwt_required()
 def get_locations():
     locations = Location.query.all()
     return jsonify({"locations": [loc.to_dict() for loc in locations]}), 200
@@ -296,8 +295,14 @@ def delete_user(user_id):
 def admin_search():
     query = request.args.get('q', '').lower()
     users, lots, reservations = [], [], []
-    
-    #If query = "all", return all users, lots, and reservations
+
+    # Helper function to format cost (DRY principle)
+    def format_cost(cost_value):
+        if isinstance(cost_value, (int, float)):
+            return f"{float(cost_value):.2f}" # Pythonic way to format float to 2 decimal places
+        return cost_value # Return as is if not a number (e.g., None, string)
+
+    # If query = "all", return all users, lots, and reservations
     if query == "all":
         for user in User.query.filter_by(admin=False).all():
             users.append({
@@ -319,11 +324,13 @@ def admin_search():
                 "ID": res.id,
                 "User ID": res.user_id,
                 "Spot ID": res.spot_id,
-                "Park Time": res.park_time,
-                "Exit Time": res.exit_time
+                "Park Time": res.park_time.strftime("%Y-%m-%d %H:%M") if res.park_time else "N/A",
+                "Exit Time": res.exit_time.strftime("%Y-%m-%d %H:%M") if res.exit_time else "N/A",
+                "Total Cost": format_cost(res.total_cost) # ⭐ FIXED HERE ⭐
             })
         return jsonify({"users": users, "lots": lots, "reservations": reservations}), 200
 
+    # Search for specific queries
     for user in User.query.filter_by(admin=False).all():
         if query in user.name.lower() or query in user.username.lower() or query in user.email.lower():
             users.append({
@@ -349,9 +356,9 @@ def admin_search():
                 "ID": res.id,
                 "User ID": res.user_id,
                 "Spot ID": res.spot_id,
-                "Park Time": res.park_time.strftime("%Y-%m-%d %H:%M"),
-                "Exit Time": res.exit_time.strftime("%Y-%m-%d %H:%M"),
-                "Total Cost": res.total_cost
+                "Park Time": res.park_time.strftime("%Y-%m-%d %H:%M") if res.park_time else "N/A",
+                "Exit Time": res.exit_time.strftime("%Y-%m-%d %H:%M") if res.exit_time else "N/A",
+                "Total Cost": format_cost(res.total_cost) # ⭐ FIXED HERE ⭐
             })
 
     return jsonify({
@@ -539,6 +546,36 @@ def user_summary():
         "spots": [spot.to_dict() for spot in spots],
         "reservations": [res.to_dict() for res in reservations]
         }), 200
+
+@cache.cached(timeout=60*60)
+@app.route("/get_usernames", methods=["GET"])
+@user_required
+def get_usernames():
+    users = User.query.filter_by(admin=False).all()
+    return jsonify({"usernames": [user.username for user in users]}), 200
+
+@cache.cached(timeout=60*60)
+@app.route("/user_profile", methods=["GET"])
+@user_required
+def user_profile():
+    user = User.query.get(get_jwt_identity())
+    #only return name, username, email
+    return jsonify({
+        "name": user.name,
+        "username": user.username,
+        "email": user.email
+    }), 200
+
+@app.route("/update_user_info", methods=["POST"])
+@user_required
+def update_user_info():
+    data = request.get_json()
+    user = User.query.get(get_jwt_identity())
+    user.name = data.get("name")
+    user.username = data.get("username")
+    user.email = data.get("email")
+    db.session.commit()
+    return jsonify({"message": "User information updated successfully"}), 200
 
 ##################################################################################
 ###############################Cache Management###################################
