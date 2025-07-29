@@ -1,0 +1,1067 @@
+openapi: 3.0.0
+info:
+  title: Parking Spot Reservation System API
+  description: API for managing parking locations, lots, spots, and user reservations.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000 # Replace with your actual server URL
+paths:
+  /:
+    get:
+      summary: Renders the index HTML page.
+      responses:
+        '200':
+          description: HTML page rendered successfully.
+  /register:
+    post:
+      summary: User Registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - username
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: John Doe
+                username:
+                  type: string
+                  example: johndoe
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  example: securepassword123
+      responses:
+        '201':
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+        '400':
+          description: User already exists or missing data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User already exists
+        '500':
+          description: Error registering user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error registering user
+  /login:
+    post:
+      summary: User Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: johndoe
+                password:
+                  type: string
+                  format: password
+                  example: securepassword123
+      responses:
+        '200':
+          description: Login successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Missing username or password.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Missing username or password
+        '401':
+          description: Invalid username or password.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid username or password
+  /get_user_info:
+    get:
+      summary: Get current user information.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                        example: johndoe
+                      email:
+                        type: string
+                        example: john.doe@example.com
+                      admin:
+                        type: boolean
+                        example: false
+  /admin_dashboard:
+    get:
+      summary: Admin Dashboard access.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Welcome admin message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Welcome admin!
+        '403':
+          description: Unauthorized access (not an admin).
+  /user_dashboard:
+    get:
+      summary: User Dashboard access.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Welcome user message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Welcome user!
+        '403':
+          description: Unauthorized access (not a user).
+  /logout:
+    post:
+      summary: User Logout
+      responses:
+        '200':
+          description: Logout successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
+  /get_locations:
+    get:
+      summary: Get all parking locations.
+      responses:
+        '200':
+          description: List of locations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: Downtown Parking
+                        city:
+                          type: string
+                          example: New York
+                        latitude:
+                          type: number
+                          format: float
+                          example: 40.7128
+                        longitude:
+                          type: number
+                          format: float
+                          example: -74.0060
+  /get_lots:
+    get:
+      summary: Get all parking lots and spots.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of parking lots and their spots.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        prime_location_name:
+                          type: string
+                          example: Central Plaza
+                        price:
+                          type: number
+                          format: float
+                          example: 5.0
+                        address:
+                          type: string
+                          example: 123 Main St
+                        pin_code:
+                          type: string
+                          example: 10001
+                        number_of_spots:
+                          type: integer
+                          example: 50
+                        location_id:
+                          type: integer
+                          example: 1
+                  spots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        lot_id:
+                          type: integer
+                          example: 1
+                        is_available:
+                          type: boolean
+                          example: true
+
+  /parking_lots:
+    get:
+      summary: Admin view of all parking lots, spots, and reserved spots.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of parking lots, spots, and reserved spots for admin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingLot'
+                  spots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingSpot'
+                  reservedSpots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservedParking'
+        '403':
+          description: Unauthorized access (not an admin).
+  /add_location:
+    post:
+      summary: Add a new parking location (Admin only).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - city
+                - latitude
+                - longitude
+              properties:
+                name:
+                  type: string
+                  example: East Side
+                city:
+                  type: string
+                  example: New York
+                latitude:
+                  type: number
+                  format: float
+                  example: 40.7128
+                longitude:
+                  type: number
+                  format: float
+                  example: -74.0060
+      responses:
+        '201':
+          description: Location added successfully.
+        '400':
+          description: Location already exists.
+        '403':
+          description: Unauthorized access (not an admin).
+  /delete_location/{location_id}:
+    delete:
+      summary: Delete a parking location by ID (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: location_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the location to delete.
+      responses:
+        '200':
+          description: Location deleted successfully.
+        '404':
+          description: Location not found.
+        '403':
+          description: Unauthorized access (not an admin).
+  /add_parking_lot:
+    post:
+      summary: Add a new parking lot (Admin only).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prime_location_name
+                - price
+                - address
+                - pin_code
+                - number_of_spots
+                - location_id
+              properties:
+                prime_location_name:
+                  type: string
+                  example: Grand Central Parking
+                price:
+                  type: number
+                  format: float
+                  example: 10.5
+                address:
+                  type: string
+                  example: 42nd Street
+                pin_code:
+                  type: string
+                  example: 10017
+                number_of_spots:
+                  type: integer
+                  example: 100
+                location_id:
+                  type: integer
+                  example: 1
+      responses:
+        '201':
+          description: Parking lot added successfully.
+        '400':
+          description: Invalid location ID or Parking lot already exists.
+        '403':
+          description: Unauthorized access (not an admin).
+  /update_parking_lot/{lot_id}:
+    post:
+      summary: Update an existing parking lot by ID (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: lot_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the parking lot to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prime_location_name
+                - price
+                - address
+                - pin_code
+                - number_of_spots
+              properties:
+                prime_location_name:
+                  type: string
+                  example: Grand Central Parking Updated
+                price:
+                  type: number
+                  format: float
+                  example: 12.0
+                address:
+                  type: string
+                  example: 42nd Street East
+                pin_code:
+                  type: string
+                  example: 10018
+                number_of_spots:
+                  type: integer
+                  example: 120
+      responses:
+        '200':
+          description: Parking lot updated successfully.
+        '400':
+          description: Missing required fields, invalid data type, or cannot reduce spots due to active reservations.
+        '404':
+          description: Parking lot not found.
+        '403':
+          description: Unauthorized access (not an admin).
+  /delete_parking_lot/{lot_id}:
+    delete:
+      summary: Delete a parking lot by ID (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: lot_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the parking lot to delete.
+      responses:
+        '200':
+          description: Parking lot deleted successfully.
+        '400':
+          description: Cannot delete lot with reserved spots.
+        '404':
+          description: Parking lot not found.
+        '403':
+          description: Unauthorized access (not an admin).
+  /get_users:
+    get:
+      summary: Get all non-admin users (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of non-admin users.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '403':
+          description: Unauthorized access (not an admin).
+  /delete_user/{user_id}:
+    delete:
+      summary: Delete a user by ID (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the user to delete.
+      responses:
+        '200':
+          description: User deleted successfully.
+        '404':
+          description: User not found.
+        '403':
+          description: Unauthorized access (not an admin).
+  /search:
+    get:
+      summary: Search users, parking lots, and reservations (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search query or "all" to retrieve all data.
+      responses:
+        '200':
+          description: Search results for users, lots, and reservations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: integer
+                        Name:
+                          type: string
+                        Username:
+                          type: string
+                        Email:
+                          type: string
+                  lots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: integer
+                        Location:
+                          type: string
+                        Address:
+                          type: string
+                        Pin:
+                          type: string
+                        Price:
+                          type: number
+                          format: float
+                  reservations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: integer
+                        User ID:
+                          type: integer
+                        Spot ID:
+                          type: integer
+                        Park Time:
+                          type: string
+                          format: date-time
+                        Exit Time:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        Total Cost:
+                          type: string # Changed to string to match "float:.2f" format
+        '403':
+          description: Unauthorized access (not an admin).
+  /admin_summary:
+    get:
+      summary: Get a summary of all lots, spots, reservations, and users (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Summary data for admin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingLot'
+                  spots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingSpot'
+                  reservations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservedParking'
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '403':
+          description: Unauthorized access (not an admin).
+  /get_spots_in_lot/{lot_id}:
+    get:
+      summary: Get all parking spots for a specific lot (User only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: lot_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the parking lot.
+      responses:
+        '200':
+          description: List of spots in the specified lot.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  spots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingSpot'
+        '403':
+          description: Unauthorized access (not a user).
+        '500':
+          description: Error retrieving spots.
+  /reserve_spot/{spot_id}:
+    post:
+      summary: Reserve a specific parking spot (User only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: spot_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the parking spot to reserve.
+      responses:
+        '200':
+          description: Spot reserved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Spot reserved successfully
+                  reservation:
+                    $ref: '#/components/schemas/ReservedParking'
+        '400':
+          description: Spot already reserved.
+        '403':
+          description: Unauthorized access (not a user).
+        '404':
+          description: Spot not found.
+  /release_parking/{reservation_id}:
+    post:
+      summary: Release a parking reservation (User only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: reservation_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the reservation to release.
+      responses:
+        '200':
+          description: Parking released successfully.
+        '403':
+          description: Unauthorized access (not the owner of the reservation, or not a user).
+        '404':
+          description: Reservation or spot not found.
+  /user_search:
+    get:
+      summary: Search parking lots and user's own reservations (User only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search query.
+      responses:
+        '200':
+          description: Search results for lots and user's reservations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: integer
+                        Location:
+                          type: string
+                        Address:
+                          type: string
+                        Pin:
+                          type: string
+                        Price:
+                          type: number
+                          format: float
+                  reservations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: integer
+                        User ID:
+                          type: integer
+                        Spot ID:
+                          type: integer
+                        Park Time:
+                          type: string
+                          format: date-time
+                        Exit Time:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        Total Cost:
+                          type: number
+                          format: float
+        '403':
+          description: Unauthorized access (not a user).
+  /available_spots/{lot_id}:
+    get:
+      summary: Get the count of available spots in a parking lot (User only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: lot_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the parking lot.
+      responses:
+        '200':
+          description: Count of available spots.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available_spots:
+                    type: integer
+                    example: 25
+        '403':
+          description: Unauthorized access (not a user).
+  /get_user_reservations/{user_name}:
+    get:
+      summary: Get all reservations for a specific user (User only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_name
+          schema:
+            type: string
+          required: true
+          description: Username of the user.
+      responses:
+        '200':
+          description: List of user's reservations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingLot'
+                  spots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingSpot'
+                  locations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+                  reservations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservedParking'
+        '403':
+          description: Unauthorized access (not a user).
+        '404':
+          description: User not found.
+  /user_summary:
+    get:
+      summary: Get a summary of user's lots, spots, and reservations (User only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Summary data for the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingLot'
+                  spots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParkingSpot'
+                  reservations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservedParking'
+        '403':
+          description: Unauthorized access (not a user).
+  /get_usernames:
+    get:
+      summary: Get all non-admin usernames (User only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of non-admin usernames.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usernames:
+                    type: array
+                    items:
+                      type: string
+                      example: johndoe
+        '403':
+          description: Unauthorized access (not a user).
+  /user_profile:
+    get:
+      summary: Get current user's profile information (User only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: John Doe
+                  username:
+                    type: string
+                    example: johndoe
+                  email:
+                    type: string
+                    example: john.doe@example.com
+        '403':
+          description: Unauthorized access (not a user).
+  /update_user_info:
+    post:
+      summary: Update current user's profile information (User only).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Jane Doe
+                username:
+                  type: string
+                  example: janedoe
+                email:
+                  type: string
+                  format: email
+                  example: jane.doe@example.com
+      responses:
+        '200':
+          description: User information updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User information updated successfully
+        '403':
+          description: Unauthorized access (not a user).
+  /clear_cache:
+    post:
+      summary: Clear application cache (Authenticated users only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cache cleared successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Cache cleared successfully
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Doe
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          example: john.doe@example.com
+        admin:
+          type: boolean
+          example: false
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2023-10-26T10:00:00Z"
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Downtown Location
+        city:
+          type: string
+          example: New York
+        latitude:
+          type: number
+          format: float
+          example: 40.7128
+        longitude:
+          type: number
+          format: float
+          example: -74.0060
+    ParkingLot:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        prime_location_name:
+          type: string
+          example: Central Parking Garage
+        price:
+          type: number
+          format: float
+          example: 7.5
+        address:
+          type: string
+          example: 100 Park Ave
+        pin_code:
+          type: string
+          example: 10001
+        number_of_spots:
+          type: integer
+          example: 150
+        location_id:
+          type: integer
+          example: 1
+    ParkingSpot:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        lot_id:
+          type: integer
+          example: 1
+        is_available:
+          type: boolean
+          example: true
+    ReservedParking:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        spot_id:
+          type: integer
+          example: 1
+        park_time:
+          type: string
+          format: date-time
+          example: "2023-10-26T09:00:00Z"
+        exit_time:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2023-10-26T11:30:00Z"
+        total_cost:
+          type: number
+          format: float
+          nullable: true
+          example: 18.75

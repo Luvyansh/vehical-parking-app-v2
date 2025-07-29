@@ -582,7 +582,7 @@ def update_user_info():
 ##################################################################################
 
 @app.route("/clear_cache", methods=["POST"])
-@admin_required
+@jwt_required()
 def clear_cache():
     cache.clear()
     return jsonify({"message": "Cache cleared successfully"}), 200
