@@ -60,7 +60,7 @@ Users can easily find and manage their parking needs with an intuitive interface
 ![User Parking Flow](https://github.com/Prabinkarki67/vehical-parking-app-v2_contribution/blob/feature/readmecorrection/assets/images/parking_flow.png)
 
 **GIF Placeholder:** Viewing Personal Summary (e.g., showing the user's parking history charts).
-![Viewing Personal Summary](https://placehold.co/600x400/000000/FFFFFF?text=Personal+Summary+GIF)
+![Viewing Personal Summary](https://github.com/Prabinkarki67/vehical-parking-app-v2_contribution/blob/feature/readmecorrection/assets/images/summary.png)
 
 ### Backend Jobs
 
