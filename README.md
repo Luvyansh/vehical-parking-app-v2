@@ -283,7 +283,7 @@ This section will contain screenshots of the application's key features and a de
 
 ## Contributing
 
-Contributions are welcome\! Please fork the repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome\! Please fork the repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change. Read [CONTRIBUTING](CONTRIBUTING.md)
 
 ## License
 
