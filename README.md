@@ -57,7 +57,7 @@ Users can easily find and manage their parking needs with an intuitive interface
 * **Personal Parking Summary:** Users can view summary charts related to their own parking history and activity.
 
 **GIF Placeholder:** User Parking Flow (e.g., showing selecting a lot, parking, and unparking).
-![User Parking Flow](https://placehold.co/600x400/000000/FFFFFF?text=User+Parking+Flow+GIF)
+![User Parking Flow](assets/images/parking_flow.png)
 
 **GIF Placeholder:** Viewing Personal Summary (e.g., showing the user's parking history charts).
 ![Viewing Personal Summary](https://placehold.co/600x400/000000/FFFFFF?text=Personal+Summary+GIF)

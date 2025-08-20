@@ -11,16 +11,20 @@ import os
 
 bcrypt = Bcrypt()
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate   # <-- ADD THIS
 
 template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
 
 # Initialize Flask app, explicitly telling it where the templates are
-app = Flask(__name__, template_folder=template_dir) # <--- MODIFIED THIS LINE
+app = Flask(__name__, template_folder=template_dir)
 app.config.from_object(Config)
 
 db.init_app(app)
 bcrypt.init_app(app)
 jwt = JWTManager(app)
+
+# Enable Flask-Migrate
+migrate = Migrate(app, db)   # <-- ADD THIS
 
 init_app(app)
 
