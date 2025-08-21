@@ -38,11 +38,11 @@ The administrator has comprehensive control over the parking system, allowing fo
 * **User Management:** Access a list of all registered users within the system.
 * **Summary Charts:** Visual summaries of parking lot and spot utilization for insightful decision-making.
 
-**GIF Placeholder:** Admin Dashboard Overview (e.g., showing lot creation, spot status, and user list).
-![Admin Dashboard Overview](https://placehold.co/600x400/000000/FFFFFF?text=Admin+Dashboard+Overview+GIF)
+**GIF Placeholder:** Admin Dashboard Overview.
+![Admin Dashboard Overview](assets/gifs/Admin.gif)
 
-**GIF Placeholder:** Creating a Parking Lot (e.g., showing the form submission and new lot appearing).
-![Creating a Parking Lot](https://placehold.co/600x400/000000/FFFFFF?text=Create+Parking+Lot+GIF)
+**GIF Placeholder:** Creating a Parking Lot.
+![Creating a Parking Lot](assets/gifs/add_lots.gif)
 
 ### User Dashboard
 
@@ -56,11 +56,11 @@ Users can easily find and manage their parking needs with an intuitive interface
 * **Timestamp Recording:** The application automatically records the `park-in` and `park-out` timestamps for each parking session.
 * **Personal Parking Summary:** Users can view summary charts related to their own parking history and activity.
 
-**GIF Placeholder:** User Parking Flow (e.g., showing selecting a lot, parking, and unparking).
-![User Parking Flow](https://github.com/Prabinkarki67/vehical-parking-app-v2_contribution/blob/feature/readmecorrection/assets/images/parking_flow.png)
+**GIF Placeholder:** User Parking Flow.
+![User Parking Flow](assets/images/parking_flow.png)
 
 **GIF Placeholder:** Viewing Personal Summary (e.g., showing the user's parking history charts).
-![Viewing Personal Summary](https://github.com/Prabinkarki67/vehical-parking-app-v2_contribution/blob/feature/readmecorrection/assets/images/summary.png)
+![Viewing Personal Summary](assets/images/summary.png)
 
 ### Backend Jobs
 
@@ -75,7 +75,7 @@ The application leverages background jobs for various automated tasks, enhancing
 * **Delivery:** Via Google Chat Webhooks, SMS, or email.
 
 **GIF Placeholder:** Daily Reminder Notification Example (e.g., a mock Google Chat/SMS/Email notification).
-![Daily Reminder Notification](https://placehold.co/600x400/000000/FFFFFF?text=Daily+Reminder+GIF)
+![Daily Reminder Notification](assets/images/daily_remainder.png)
 
 #### b. Scheduled Job - Monthly Activity Report
 
@@ -88,8 +88,8 @@ The application leverages background jobs for various automated tasks, enhancing
     * Any other relevant user-specific parking information.
 * **Delivery:** Sent as an email to the user.
 
-**GIF Placeholder:** Monthly Report Email Example (e.g., a mock email showing the HTML report).
-![Monthly Report Email](https://placehold.co/600x400/000000/FFFFFF?text=Monthly+Report+GIF)
+**GIF Placeholder:** Monthly Report Email. <br>
+![Monthly Report Email](assets/images/monthly_mail.png)
 
 #### c. User Triggered Async Job - Export as CSV
 
@@ -105,8 +105,8 @@ The application leverages background jobs for various automated tasks, enhancing
 * **Process:** Triggers a batch job in the background.
 * **Notification:** Sends an alert to the user once the CSV export is complete and ready for download.
 
-**GIF Placeholder:** CSV Export Trigger and Notification (e.g., showing the button click, a loading state, and a "download ready" notification).
-![CSV Export Trigger](https://placehold.co/600x400/000000/FFFFFF?text=CSV+Export+GIF)
+**GIF Placeholder:** CSV Export. <br>
+![CSV Export Trigger](assets/images/csv_report.png)
 
 ### Performance & Caching
 
