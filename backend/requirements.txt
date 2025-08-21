@@ -13,3 +13,4 @@ Faker
 Redis
 flask_mail
 Flask-Caching
+flask_migrate

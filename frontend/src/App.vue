@@ -1,8 +1,18 @@
 <template>
-  <router-view/>
+  <router-view />
 </template>
 
 <style>
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  /* 🚫 Prevent horizontal scroll */
+  width: 100%;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
