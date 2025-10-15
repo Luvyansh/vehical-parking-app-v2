@@ -1,4 +1,4 @@
-# 🚗 Vehicle Parking App - V2
+# 🚗 Vehicle Parking App - V2 (ParkingPal)
 
 A robust, multi-user parking management system designed specifically for 4-wheeler vehicles. This application features distinct roles for administrators and regular users, real-time parking status updates, and a suite of automated backend jobs for enhanced functionality and user engagement.
 
